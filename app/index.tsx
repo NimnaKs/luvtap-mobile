@@ -1,102 +1,60 @@
-import { useEffect, useRef } from 'react';
-import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
-
-import { Fonts } from '@/constants/theme';
+import { useState } from 'react';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image } from 'expo-image';
 
 export default function LaunchScreen() {
-  const router = useRouter();
-  const opacity = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(0.96)).current;
-  const pulse = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 700,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.spring(scale, {
-        toValue: 1,
-        friction: 7,
-        tension: 60,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1,
-          duration: 1300,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 0,
-          duration: 1300,
-          easing: Easing.inOut(Easing.sin),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    const timer = setTimeout(() => {
-      router.replace('/(tabs)');
-    }, 2200);
-
-    return () => clearTimeout(timer);
-  }, [opacity, pulse, router, scale]);
-
-  const glowScale = pulse.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.08],
-  });
-
-  const glowOpacity = pulse.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.55, 0.9],
-  });
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <View style={styles.container}>
-      <View style={styles.backdrop} />
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.pinkGlow,
-          {
-            opacity: glowOpacity,
-            transform: [{ scale: glowScale }],
-          },
-        ]}
-      />
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          styles.purpleGlow,
-          {
-            opacity: glowOpacity,
-            transform: [{ scale: glowScale }],
-          },
-        ]}
-      />
-      <Animated.View
-        style={[
-          styles.brandRow,
-          {
-            opacity,
-            transform: [{ scale }],
-          },
-        ]}>
-        <Text style={styles.heart}>{'\u2665'}</Text>
-        <Text style={styles.wordmark}>
-          <Text style={styles.wordmarkPink}>Luv</Text>
-          <Text style={styles.wordmarkPurple}>Tap</Text>
-        </Text>
-      </Animated.View>
+      <View style={styles.content}>
+        <Image
+          source={require('@/assets/images/icon.png')}
+          style={styles.logo}
+          contentFit="contain"
+        />
+
+        <View style={styles.form}>
+          <TextInput
+            value={username}
+            onChangeText={setUsername}
+            placeholder="Username or email"
+            placeholderTextColor="#8f9096"
+            style={styles.input}
+            autoCapitalize="none"
+            autoCorrect={false}
+            textContentType="username"
+          />
+          <TextInput
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+            placeholderTextColor="#8f9096"
+            style={styles.input}
+            secureTextEntry
+            textContentType="password"
+          />
+
+          <Pressable style={styles.primaryButton}>
+            <Text style={styles.primaryButtonText}>Log in</Text>
+          </Pressable>
+
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <Pressable style={styles.secondaryButton}>
+            <Text style={styles.secondaryButtonText}>Create new account</Text>
+          </Pressable>
+
+          <Pressable>
+            <Text style={styles.forgotText}>Forgot password?</Text>
+          </Pressable>
+        </View>
+      </View>
     </View>
   );
 }
@@ -104,71 +62,95 @@ export default function LaunchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#9f9f9f',
+    backgroundColor: '#0f1115',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    paddingHorizontal: 24,
   },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  pinkGlow: {
-    position: 'absolute',
-    width: 320,
-    height: 320,
-    borderRadius: 320,
-    backgroundColor: 'rgba(255, 79, 156, 0.22)',
-    shadowColor: '#ff4f9c',
-    shadowOpacity: 0.75,
-    shadowRadius: 80,
-    shadowOffset: { width: 0, height: 0 },
-  },
-  purpleGlow: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 280,
-    backgroundColor: 'rgba(168, 92, 255, 0.18)',
-    shadowColor: '#a85cff',
-    shadowOpacity: 0.7,
-    shadowRadius: 90,
-    shadowOffset: { width: 0, height: 0 },
-    right: '20%',
-    top: '44%',
-  },
-  brandRow: {
-    flexDirection: 'row',
+  content: {
+    width: '100%',
+    maxWidth: 360,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
+    gap: 16,
   },
-  heart: {
-    color: '#ff4fa3',
-    fontSize: 84,
-    marginRight: 12,
-    textShadowColor: 'rgba(255, 79, 156, 0.9)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 28,
-    includeFontPadding: false,
-    lineHeight: Platform.select({ ios: 84, android: 92, default: 84 }),
+  logo: {
+    width: 240,
+    height: 240,
+    alignSelf: 'center',
+    marginBottom: 14,
   },
-  wordmark: {
-    fontFamily: Fonts.rounded,
-    fontSize: 88,
-    fontStyle: 'italic',
-    letterSpacing: -2,
-    includeFontPadding: false,
-    lineHeight: Platform.select({ ios: 88, android: 96, default: 88 }),
-    textShadowColor: 'rgba(255, 92, 186, 0.8)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 24,
+  form: {
+    width: '100%',
+    gap: 10,
   },
-  wordmarkPink: {
-    color: '#ff4fa3',
+  input: {
+    width: '100%',
+    height: 48,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#2a2d34',
+    backgroundColor: '#171a21',
+    color: '#f5f6fa',
+    paddingHorizontal: 14,
+    fontSize: 15,
   },
-  wordmarkPurple: {
-    color: '#b05cff',
+  primaryButton: {
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#f3f4f6',
+    marginTop: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+  },
+  primaryButtonText: {
+    color: '#0f1115',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 8,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#2a2d34',
+  },
+  dividerText: {
+    color: '#8f9096',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  secondaryButton: {
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#2a2d34',
+    backgroundColor: '#111319',
+  },
+  secondaryButtonText: {
+    color: '#f5f6fa',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  forgotText: {
+    color: '#d5d7dd',
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 4,
   },
 });
