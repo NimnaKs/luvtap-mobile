@@ -53,11 +53,7 @@ export default function SplashScreen() {
   return (
     <SafeAreaView style={styles.root}>
       <Animated.View style={[styles.logoWrap, { transform: [{ scale }], opacity }]}>
-        <Image
-          source={require('@/assets/images/icon.png')}
-          style={styles.logo}
-          contentFit="contain"
-        />
+        <Image source={require('@/assets/images/icon.png')} style={styles.logo} contentFit="contain" />
       </Animated.View>
     </SafeAreaView>
   );
