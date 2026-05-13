@@ -42,6 +42,7 @@ const slides: Slide[] = [
     text: 'Open WhatsApp instantly so caring stays effortless, not complicated.',
     accent: '#d55f79',
     shadow: 'rgba(213, 95, 121, 0.18)',
+    image: require('@/assets/images/image-2.png'),
   },
   {
     id: 'warm',
@@ -49,6 +50,7 @@ const slides: Slide[] = [
     text: 'Minimal, calm, and emotionally intelligent from the first screen onward.',
     accent: '#b96fb1',
     shadow: 'rgba(185, 111, 177, 0.18)',
+    image: require('@/assets/images/image-3.png'),
   },
 ];
 
