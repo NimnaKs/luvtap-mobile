@@ -16,7 +16,11 @@ import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+const SLIDE_WIDTH = width - 40;
 const CARD_SIZE = Math.min(width - 56, 340);
+const HERO_HEIGHT = CARD_SIZE + 26;
+const TITLE_HEIGHT = 88;
+const TEXT_HEIGHT = 76;
 
 type Slide = {
   id: string;
@@ -68,29 +72,35 @@ export default function OnboardingScreen() {
   }, [fade]);
 
   const onScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
+    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / SLIDE_WIDTH);
     setIndex(nextIndex);
   };
 
   const renderItem = ({ item }: ListRenderItemInfo<Slide>) => (
     <View style={styles.slide}>
-      <View style={[styles.illustrationCard, { shadowColor: item.shadow }]}>
-        <View style={[styles.lightWash, { backgroundColor: `${item.accent}20` }]} />
-        {item.image ? (
-          <Image source={item.image} style={styles.cardImage} contentFit="cover" />
-        ) : (
-          <>
-            <View style={[styles.heartLeft, { backgroundColor: item.accent }]} />
-            <View style={[styles.heartRight, { backgroundColor: item.accent }]} />
-            <View style={[styles.heartShadow, { backgroundColor: item.shadow }]} />
-            <View style={styles.squiggleOne} />
-            <View style={styles.squiggleTwo} />
-          </>
-        )}
-      </View>
+      <View style={styles.slideContent}>
+        <View style={[styles.heroFrame, { height: HERO_HEIGHT }]}>
+          <View style={[styles.illustrationCard, { shadowColor: item.shadow }]}>
+            <View style={[styles.lightWash, { backgroundColor: `${item.accent}20` }]} />
+            {item.image ? (
+              <Image source={item.image} style={styles.cardImage} contentFit="cover" />
+            ) : (
+              <>
+                <View style={[styles.heartLeft, { backgroundColor: item.accent }]} />
+                <View style={[styles.heartRight, { backgroundColor: item.accent }]} />
+                <View style={[styles.heartShadow, { backgroundColor: item.shadow }]} />
+                <View style={styles.squiggleOne} />
+                <View style={styles.squiggleTwo} />
+              </>
+            )}
+          </View>
+        </View>
 
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.text}>{item.text}</Text>
+        <View style={styles.copyBlock}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.text}>{item.text}</Text>
+        </View>
+      </View>
     </View>
   );
 
@@ -115,12 +125,14 @@ export default function OnboardingScreen() {
           data={slides}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          style={styles.carouselList}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
           onMomentumScrollEnd={onScrollEnd}
-          snapToInterval={width - 40}
           decelerationRate="fast"
+          snapToAlignment="start"
+          disableIntervalMomentum
           contentContainerStyle={styles.carousel}
         />
 
@@ -179,22 +191,41 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    paddingBottom: 22,
+  },
+  carouselList: {
+    flex: 1,
   },
   carousel: {
-    alignItems: 'center',
+    alignItems: 'stretch',
+    flexGrow: 1,
   },
   slide: {
-    width: width - 40,
+    width: SLIDE_WIDTH,
+    height: '100%',
     alignItems: 'center',
-    paddingTop: 22,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+  },
+  slideContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+    paddingTop: 16,
+  },
+  heroFrame: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   illustrationCard: {
     width: CARD_SIZE,
     height: CARD_SIZE,
     borderRadius: 34,
     backgroundColor: '#fff3e3',
-    marginBottom: 28,
+    marginBottom: 26,
     alignItems: 'center',
     justifyContent: 'center',
     shadowOpacity: 0.12,
@@ -245,6 +276,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  copyBlock: {
+    alignItems: 'center',
+    width: '100%',
+    marginTop: 18,
+    minHeight: TITLE_HEIGHT + TEXT_HEIGHT,
+    justifyContent: 'flex-start',
+  },
   squiggleOne: {
     position: 'absolute',
     top: 86,
@@ -275,6 +313,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.4,
     maxWidth: 260,
+    minHeight: TITLE_HEIGHT,
   },
   text: {
     marginTop: 12,
@@ -282,7 +321,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     textAlign: 'center',
-    maxWidth: 280,
+    maxWidth: 300,
+    minHeight: TEXT_HEIGHT,
   },
   dots: {
     flexDirection: 'row',
